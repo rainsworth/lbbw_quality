@@ -8,7 +8,7 @@ We are adapting quality control scripts (astrometry, flux accuracy, dynamic rang
 ### Contributors
 
 * [Alexander Kappes](https://github.com/alexmatze)
-* Frits Sweijen
+* [Frits Sweijen](https://github/com/tikker)
 * Maria Arias
 * [Rachael Ainsworth](https://github.com/rainsworth)
 * [Sean Mooney](https://github.com/mooneyse)
