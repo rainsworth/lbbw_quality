@@ -6,6 +6,7 @@ matplotlib.use('Agg')
 
 import os,sys
 import os.path
+sys.path.append(os.path.abspath("./utils"))
 from quality_parset import option_list
 from options import options,print_options
 from astropy.io import fits
