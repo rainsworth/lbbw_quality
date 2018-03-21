@@ -113,7 +113,7 @@ def crossmatch_image(lofarcat,auxcatname,options=None):
         t.write(lofarcat+'_'+auxcatname+'_match.fits')
 
 def main(msin,config_path):
-    o=options(config_path,option_list)
+    global o=options(config_path,option_list)
     if o['pbimage'] is None:
         die('pbimage must be specified')
 
