@@ -1,5 +1,4 @@
 ! script = /data020/scratch/sean/lbbw_quality/quality_pipeline_lb.py
-! util_scripts = /data020/scratch/sean/lbbw_quality/utils/
 
 pipeline.steps=[createmap_cal, quality_step]
 
@@ -15,4 +14,3 @@ quality_step.control.type             = pythonplugin
 quality_step.argument.msin            = createmap_cal.output.mapfile
 quality_step.control.executable       = {{ script }}
 quality_step.argument.config_path     = '/data020/scratch/sean/lbbw_quality/quality_lb.cfg'
-quality_step.argument.python_path     = {{ util_scripts }}
