@@ -1,4 +1,4 @@
-! script = /data020/scratch/sean/ddf-pipeline/QUALITY/lbb_quality_ppl.py
+! script = /data020/scratch/sean/ddf-pipeline/QUALITY/quality_pipeline_lb.py
 
 pipeline.steps=[createmap_cal,quality_step]
 
