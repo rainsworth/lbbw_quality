@@ -1,4 +1,4 @@
-! quality_script = /data020/scratch/sean/lbbw_quality/quality_lb.parset
+! quality_script = /data020/scratch/sean/lbbw_quality/quality_lb.py
 
 pipeline.steps=[createmap_cal, quality_step]
 
