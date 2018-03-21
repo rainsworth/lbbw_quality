@@ -83,6 +83,12 @@ def main(msin,config_path, python_path):
         imsizex = f[0].header['NAXIS1']
         imsizey = f[0].header['NAXIS2']
         f.close()
+	old_dir = os.getcwd()
+	filename = pbimage.split('/')[-1]
+	dirname = '/'.join(pbimage.split('/')[:-1]) + '/'
+	os.chdir(dirname)
+	print('Filename: ', filename)
+	print('Dirname: ', dirname)
         kwargs={}
         if o['sfind_pixel_fraction']<1.0:
             lowerx,upperx = int(((1.0-sfind_pixel_fraction)/2.0)*imsizex),int(((1.0-sfind_pixel_fraction)/2.0)*imsizex + sfind_pixel_fraction*imsizex)
@@ -92,12 +98,13 @@ def main(msin,config_path, python_path):
         if options['restart'] and os.path.isfile(catprefix +'.cat.fits'):
             warn('File ' + catprefix +'.cat.fits already exists, skipping source finding step')
         else:
-            img = bdsm.process_image(pbimage, detection_image='', thresh_isl=4.0, thresh_pix=5.0, rms_box=(150,15), rms_map=True, mean_map='zero', ini_method='intensity', adaptive_rms_box=True, adaptive_thresh=150, rms_box_bright=(60,15), group_by_isl=False, group_tol=10.0,output_opts=True, output_all=True, atrous_do=False,atrous_jmax=4, flagging_opts=True, flag_maxsize_fwhm=0.5,advanced_opts=True, blank_limit=None,**kwargs)
+            img = bdsm.process_image(filename, detection_image='', thresh_isl=4.0, thresh_pix=5.0, rms_box=(150,15), rms_map=True, mean_map='zero', ini_method='intensity', adaptive_rms_box=True, adaptive_thresh=150, rms_box_bright=(60,15), group_by_isl=False, group_tol=10.0,output_opts=True, output_all=True, atrous_do=False,atrous_jmax=4, flagging_opts=True, flag_maxsize_fwhm=0.5,advanced_opts=True, blank_limit=None,**kwargs)
             img.write_catalog(outfile=catprefix +'.cat.fits',catalog_type='srl',format='fits',correct_proj='True')
             img.export_image(outfile=catprefix +'.rms.fits',img_type='rms',img_format='fits',clobber=True)
             img.export_image(outfile=catprefix +'.resid.fits',img_type='gaus_resid',img_format='fits',clobber=True)
             img.export_image(outfile=catprefix +'.pybdsmmask.fits',img_type='island_mask',img_format='fits',clobber=True)
             img.write_catalog(outfile=catprefix +'.cat.reg',catalog_type='srl',format='ds9',correct_proj='True')
+	    os.chdir(old_dir)
 
     def crossmatch_image(lofarcat,auxcatname,options=None):
         if options is None:
