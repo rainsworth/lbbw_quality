@@ -20,6 +20,8 @@ import numpy as np
 from crossmatch_utils import match_catalogues,filter_catalogue,select_isolated_sources,bootstrap
 from quality_make_plots import plot_flux_ratios,plot_flux_errors,plot_position_offset
 
+global o
+
 #Define various angle conversion factors
 arcsec2deg=1.0/3600
 arcmin2deg=1.0/60
@@ -113,7 +115,7 @@ def crossmatch_image(lofarcat,auxcatname,options=None):
         t.write(lofarcat+'_'+auxcatname+'_match.fits')
 
 def main(msin,config_path):
-    global o=options(config_path,option_list)
+    o=options(config_path,option_list)
     if o['pbimage'] is None:
         die('pbimage must be specified')
 
