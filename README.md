@@ -11,4 +11,4 @@ We are adapting quality control scripts (astrometry, flux accuracy, dynamic rang
 * Frits Sweijen
 * Maria Arias
 * [Rachael Ainsworth](https://github.com/rainsworth)
-* Sean Mooney
+* [Sean Mooney](https://github.com/mooneyse)
