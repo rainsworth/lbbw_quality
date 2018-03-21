@@ -1,16 +1,16 @@
-! script = /data020/scratch/sean/ddf-pipeline/QUALITY/quality_pipeline_lb.py
+! quality_script = /data020/scratch/sean/lbbw_quality/quality_lb.parset
 
-pipeline.steps=[createmap_cal,quality_step]
+pipeline.steps=[createmap_cal, quality_step]
 
 createmap_cal.control.kind            =   plugin
 createmap_cal.control.type            =   createMapfile
 createmap_cal.control.method          =   mapfile_from_folder
 createmap_cal.control.mapfile_dir     =   input.output.mapfile_dir
 createmap_cal.control.filename        =   createmap_cal.mapfile
-createmap_cal.control.folder          =   /data020/scratch/sean/ddf-pipeline/QUALITY/
-createmap_cal.control.pattern         =   L1327*.ms
+createmap_cal.control.folder          =   /data020/scratch/sean/
+createmap_cal.control.pattern         =   L*.ms
 
 quality_step.control.type             = pythonplugin
 quality_step.argument.msin            = createmap_cal.output.mapfile
-quality_step.control.executable       = {{ script }}
-quality_step.argument.config_path     = 'path/to/cfgfile'
+quality_step.control.executable       = {{ quality_script }}
+quality_step.argument.config_path     = '/data020/scratch/sean/lbbw_quality/quality_lb.cfg'
