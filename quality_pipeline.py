@@ -14,7 +14,7 @@ try:
     import bdsf as bdsm
 except ImportError:
     import lofar.bdsm as bdsm
-#from auxcodes import report,run,get_rms,warn,die,sepn
+from auxcodes import report,run,get_rms,warn,die,sepn
 import numpy as np
 from crossmatch_utils import match_catalogues,filter_catalogue,select_isolated_sources,bootstrap
 from quality_make_plots import plot_flux_ratios,plot_flux_errors,plot_position_offset
@@ -45,7 +45,7 @@ def filter_catalog(singlecat,matchedcat,fitsimage,outname,auxcatname,options=Non
         options = o
 
     if options['restart'] and os.path.isfile(outname):
-        print('File ' + outname +' already exists, skipping source filtering step')
+        warn('File ' + outname +' already exists, skipping source filtering step')
     else:
 
         matchedcat = Table.read(matchedcat)
@@ -76,8 +76,6 @@ def filter_catalog(singlecat,matchedcat,fitsimage,outname,auxcatname,options=Non
         matchedcat.write(outname)
 
 def sfind_image(catprefix,pbimage,sfind_pixel_fraction,options=None):
-    import os
-    print os.getcwd()
     if options is None:
         options = o
     f = fits.open(pbimage)
@@ -91,7 +89,7 @@ def sfind_image(catprefix,pbimage,sfind_pixel_fraction,options=None):
         kwargs['trim_box']=(lowerx,upperx,lowery,uppery)
 
     if options['restart'] and os.path.isfile(catprefix +'.cat.fits'):
-        print('File ' + catprefix +'.cat.fits already exists, skipping source finding step')
+        warn('File ' + catprefix +'.cat.fits already exists, skipping source finding step')
     else:
         img = bdsm.process_image(pbimage, detection_image='', thresh_isl=4.0, thresh_pix=5.0, rms_box=(150,15), rms_map=True, mean_map='zero', ini_method='intensity', adaptive_rms_box=True, adaptive_thresh=150, rms_box_bright=(60,15), group_by_isl=False, group_tol=10.0,output_opts=True, output_all=True, atrous_do=True,atrous_jmax=4, flagging_opts=True, flag_maxsize_fwhm=0.5,advanced_opts=True, blank_limit=None,**kwargs)
         img.write_catalog(outfile=catprefix +'.cat.fits',catalog_type='srl',format='fits',correct_proj='True')
@@ -101,12 +99,11 @@ def sfind_image(catprefix,pbimage,sfind_pixel_fraction,options=None):
         img.write_catalog(outfile=catprefix +'.cat.reg',catalog_type='srl',format='ds9',correct_proj='True')
 
 def crossmatch_image(lofarcat,auxcatname,options=None):
-
     if options is None:
         options = o
     auxcat = options[auxcatname]
     if options['restart'] and os.path.isfile(lofarcat + '_' + auxcatname + '_match.fits'):
-        print('File ' + lofarcat + '_' + auxcatname + '_match.fits already exists, skipping source matching step')
+        warn('File ' + lofarcat + '_' + auxcatname + '_match.fits already exists, skipping source matching step')
     else:
         t=Table.read(lofarcat)
         tab=Table.read(auxcat)
@@ -117,7 +114,7 @@ def crossmatch_image(lofarcat,auxcatname,options=None):
 def main(msin,config_path):
     o=options(config_path,option_list)
     if o['pbimage'] is None:
-        raise ValueError('pbimage must be specified')
+        die('pbimage must be specified')
 
     # fix up the new list-type options
     for i,cat in enumerate(o['list']):
@@ -150,7 +147,7 @@ def main(msin,config_path):
 
     # Astrometric plots
     if 'FIRST' in o['list']:
-        print('Plotting position offsets')
+        report('Plotting position offsets')
         plot_position_offset('%s.cat.fits_FIRST_match_filtered.fits'%o['catprefix'],o['pbimage'],'%s.cat.fits_FIRST_match_filtered_positions.png'%o['catprefix'],'FIRST',options=o)
 
         t=Table.read(o['catprefix']+'.cat.fits_FIRST_match_filtered.fits')
@@ -161,11 +158,11 @@ def main(msin,config_path):
         print 'Mean delta RA is %.3f arcsec (1-sigma %.3f -- %.3f arcsec)' % (mdra,bsra[0],bsra[1])
         print 'Mean delta DEC is %.3f arcsec (1-sigma %.3f -- %.3f arcsec)' % (mddec,bsdec[0],bsdec[1])
 
-        print('Plotting flux ratios')
+        report('Plotting flux ratios')
         # Flux ratio plots (only compact sources)
         plot_flux_ratios('%s.cat.fits_FIRST_match_filtered.fits'%o['catprefix'],o['pbimage'],'%s.cat.fits_FIRST_match_filtered_fluxerrors.png'%o['catprefix'],options=o)
 
-    print('Plotting flux scale comparison')
+    report('Plotting flux scale comparison')
     # Flux scale comparison plots
     if 'TGSS' in o['list']:
         plot_flux_errors('%s.cat.fits_TGSS_match_filtered.fits'%o['catprefix'],o['pbimage'],'%s.cat.fits_TGSS_match_filtered_fluxratio.png'%o['catprefix'],'TGSS',options=o)
@@ -185,7 +182,3 @@ def main(msin,config_path):
     imagenoise = get_rms(hdu)
     print 'An estimate of the image noise is %.3f muJy/beam' % (imagenoise*1E6)
     return 0
-
-
-if __name__=='__main__':
-    # Main loop
