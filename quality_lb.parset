@@ -22,7 +22,6 @@ createmap_cal.control.filename        =   createmap_cal.mapfile
 createmap_cal.control.folder          =   /data/scratch/ainsworth/
 createmap_cal.control.pattern         =   L*.ms
 
-things
 # Run the Quality_lb python-script
 quality_step.control.type             = pythonplugin
 quality_step.argument.msin            = createmap_cal.output.mapfile
