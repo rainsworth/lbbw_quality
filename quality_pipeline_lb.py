@@ -244,9 +244,6 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     global o
     o=options(config_path,option_list)
     #ingest config data:
-    o['']
-
-    print(o)
     if o['pbimage'] is None:
         die('pbimage must be specified')
 
