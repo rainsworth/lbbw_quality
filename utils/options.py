@@ -19,6 +19,7 @@ def download_cat(path,url): #need to catch cases where files are packed - what a
         os.system("wget " + url +" "+ path)
         if filename.split('.')[-1] == 'gz':
             os.system("gunzip "+filename+'.gz')
+    return path + fitsname
 
 def _get_terminal_size_linux():
     ''' From https://gist.github.com/jtriley/1108174 '''
