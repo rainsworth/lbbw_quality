@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Routine to check quality of LOFAR images
-def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, first_server, lots_server):
+def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, first_server, lotss_server):
     ''' Main entry function called by the genericpipeline framework.
     Args:
         msin (str): input measurement set being processed.
@@ -48,8 +48,8 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
 
 
     #get all the catalogues
-    catlist=[tgss_server,nvss_server,lots_server,first_server]
-    for i,cat in enumerate(("TGSS","NVSS","LOTS","FIRST")):
+    catlist=[tgss_server,nvss_server,lotss_server,first_server]
+    for i,cat in enumerate(("TGSS","NVSS","LOTSS","FIRST")):
         if catlist[i].upper() != 'NONE':
             catlist[i] = download_cat(cat_path, catlist[i])
         else:
@@ -87,12 +87,12 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
                     ( 'comparison_cats', 'NVSS_match_majkey2', float, 'Maj_2' ),
                     ( 'comparison_cats', 'NVSS_filtersize', float, 40.0 ),
                     ( 'comparison_cats', 'NVSS_fluxfactor', float, 1000.0 ),
-                    ( 'comparison_cats', 'LOTS', str, catlist[2] ),
-                    ( 'comparison_cats', 'LOTS_matchrad', float, 10.0 ),
-                    ( 'comparison_cats', 'LOTS_match_majkey1', float, 'Maj_1' ),
-                    ( 'comparison_cats', 'LOTS_match_majkey2', float, 'Maj_2' ),
-                    ( 'comparison_cats', 'LOTS_filtersize', float, 40.0 ),
-                    ( 'comparison_cats', 'LOTS_fluxfactor', float, 1000.0 ),
+                    ( 'comparison_cats', 'LOTSS', str, catlist[2] ),
+                    ( 'comparison_cats', 'LOTSS_matchrad', float, 10.0 ),
+                    ( 'comparison_cats', 'LOTSS_match_majkey1', float, 'Maj_1' ),
+                    ( 'comparison_cats', 'LOTSS_match_majkey2', float, 'Maj_2' ),
+                    ( 'comparison_cats', 'LOTSS_filtersize', float, 40.0 ),
+                    ( 'comparison_cats', 'LOTSS_fluxfactor', float, 1000.0 ),
                     ( 'comparison_cats', 'FIRST', str, catlist[3] ),
                     ( 'comparison_cats', 'FIRST_matchrad', float, 10.0 ),
                     ( 'comparison_cats', 'FIRST_match_majkey1', float, 'Maj' ),
@@ -249,6 +249,7 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
 
     print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
     print o['list']
+    print type(o['list'])
     # fix up the new list-type options - NO DONT!
     # for i,cat in enumerate(o['list']):
     #     try:
