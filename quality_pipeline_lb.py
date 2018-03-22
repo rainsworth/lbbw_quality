@@ -1,25 +1,37 @@
 #!/usr/bin/env python
 # Routine to check quality of LOFAR images
+
 def main(msin,config_path, python_path):
-    import matplotlib
-    matplotlib.use('Agg')
-    import os,sys
+    ''' Main entry function called by the genericpipeline framework.
+    Args:
+        msin (str): input measurement set being processed.
+        config_path (str): path to the pipeline cfg file.
+        python_path (str): additional paths to be added to the Python path at runtime.
+    Returns:
+        0 (int)
+    '''
+    import os
     import os.path
+    import sys
     sys.path.append(os.path.abspath(python_path))
-    from quality_parset import option_list
-    from options import options,print_options
-    from astropy.io import fits
-    from astropy.table import Table
+
     try:
         import bdsf as bdsm
     except ImportError:
         import lofar.bdsm as bdsm
-    from auxcodes import report,run,get_rms,warn,die,sepn
+    import matplotlib
+    matplotlib.use('Agg')
     import numpy as np
+
+    from quality_parset import option_list
+    from options import options,print_options
+    from astropy.io import fits
+    from astropy.table import Table
+    from auxcodes import report,run,get_rms,warn,die,sepn
     from crossmatch_utils import match_catalogues,filter_catalogue,select_isolated_sources,bootstrap
     from quality_make_plots import plot_flux_ratios,plot_flux_errors,plot_position_offset
 
-    #Define various angle conversion factors
+    # Define various angle conversion factors.
     arcsec2deg=1.0/3600
     arcmin2deg=1.0/60
     deg2rad=np.pi/180
@@ -33,6 +45,15 @@ def main(msin,config_path, python_path):
     degsquared2steradians = 1.0/steradians2degsquared
 
     def logfilename(s,options=None):
+        ''' Returns full path to the log file, using the 'logging' parameter defined in the options.
+        Args:
+            s (str): log file name.
+            options (dict): dictionary containig the options. This is read from quality_parset.py.
+        Returns:
+            log path (str): full path to the logging file.
+            OR
+            None: when options['logging'] is not defined.
+        '''
         if options is None:
             options=o
         if options['logging'] is not None:
@@ -41,6 +62,23 @@ def main(msin,config_path, python_path):
             return None
 
     def filter_catalog(singlecat,matchedcat,fitsimage,outname,auxcatname,options=None):
+        ''' Filter the catalogues by radius, size and isolation.
+
+        Sources are filtered out based on the following conditions:
+            - Located further away than 3 degrees from the phase center.
+            - Over 10 arcsec in size in the LOFAR catalogue.
+            - Isolated.
+
+        Args:
+            singlecat (str): (long baseline) catalogue extracted from the fits file.
+            matchedcat (str): catalogue containing the matched sources between the LOFAR image and catalogue that was matched against.
+            fitsimage (str): the original images.
+            outname (str): filename for the output diagnostic plot.
+            auxcatname (str): the name of the catalogue that was matched against.
+            options (dict): the options dictionary defined in quality_parset.py.
+        Returns:
+            None
+        '''
         if options is None:
             options = o
 
@@ -76,6 +114,15 @@ def main(msin,config_path, python_path):
             matchedcat.write(outname)
 
     def sfind_image(catprefix,pbimage,sfind_pixel_fraction,options=None):
+        ''' Find sources in the image using PyBDSF.
+        Args:
+            catprefix (str): prefix to use for output catalogues.
+            pbimage (str): the image in which to find the sources.
+            sfind_pixel_fraction (float): a value between 0.0 and 1.0 denoting the fraction of the image over which to look for sources.
+            options (dict): the options dictionary defined in quality_parset.py.
+        Returns:
+            None
+        '''
         if options is None:
             options = o
         f = fits.open(pbimage)
@@ -106,6 +153,16 @@ def main(msin,config_path, python_path):
 	    #os.chdir(old_dir)
 
     def crossmatch_image(lofarcat,auxcatname,options=None):
+        ''' Cross match the LOFAR catalogue with an auxilliary catalogue.
+
+        Args:
+            lofarcat (str): the LOFAR catalogue.
+            auxcatname (str): the auxilliary catalogue to match against.
+            options (dict): the options dictionary defined in quality_parset.py.
+
+        Returns:
+            None
+        '''
         if options is None:
             options = o
         auxcat = options[auxcatname]
