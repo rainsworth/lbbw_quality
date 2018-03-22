@@ -108,17 +108,18 @@ def main(ms_input, ResultsFile, Radius=1.5, DoDownload="True", AllFile=None):
     print "DOWNLOADING LOTSS Skymodel for the target into "+ ResultsFile
 
     # Reading a MS to find the coordinate (pyrap)
-    #[RATar,DECTar]=grab_coo_MS(input2strlist_nomapfile(ms_input)[0])
-    #mypos = ( RATar, DECTar )
-    RATar, DECTar = grab_coo_MS(input2strlist_nomapfile(ms_input)[0])
+    [RATar,DECTar]=grab_coo_MS(input2strlist_nomapfile(ms_input)[0])
+    mypos = ( RATar, DECTar )
+    #RATar, DECTar = grab_coo_MS(input2strlist_nomapfile(ms_input)[0])
 
     ## this is the tier 1 database to query
     url = 'http://vo.astron.nl/lofartier1/q/cone/scs.xml'
 
     ## this works
     query = vo.dal.scs.SCSQuery( url )
-    query['RA'] = float( RATar )
-    query['DEC'] = float( DECTar )
+    #query['RA'] = float( RATar )
+    #query['DEC'] = float( DECTar )
+    query.pos = (float( RATar ), float(DECTar))
     query.radius = float( Radius )
     t = query.execute()   
     ## this does not
@@ -160,6 +161,6 @@ if __name__ == "__main__":
     radius=1.5
     if args.Radius:
         radius=args.Radius
-
-    main(args.MSfile,args.Outfile,Radius=radius)
+    
+    main(args.MSfile,args.Outfile,Radius=radius,AllFile=args.Outfile+'_all')
 
