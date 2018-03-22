@@ -5,6 +5,22 @@ import os
 import struct
 import re
 
+def download_cat(path,url): #need to catch cases where files are packed - what about csv? - conversion?
+    filename = url.split('/')[-1]
+    if filename.split('.')[-1] == 'gz':
+        fitsname = '.'.join(filename.split('.')[:-1])
+    else:
+        fitsname = filename
+#
+    path_to_file = path + fitsname
+    if os.path.isfile(path_to_file):
+        print("Catalogue "+fitsname+" already exists - skipping download")
+    else:
+        os.system("wget " + url +" "+ path)
+        if filename.split('.')[-1] == 'gz':
+            os.system("gunzip -c " + filename + " > "+ path_to_file)
+    return path + fitsname
+
 def _get_terminal_size_linux():
     ''' From https://gist.github.com/jtriley/1108174 '''
     def ioctl_GWINSZ(fd):
@@ -107,7 +123,7 @@ def print_options(option_list):
                 print 'Oops!',o
                 continue
             if section==s:
-                
+
                 print bcolors.BOLD+fstring % (name, typename(otype), str(default))+bcolors.ENDC
                 if doc is not None:
                     print textwrap.fill(doc,width-1,initial_indent=indent,subsequent_indent=indent)
@@ -117,4 +133,3 @@ if __name__=='__main__':
     from parset import option_list
     config=sys.argv[1:]
     print options(config,option_list)
-
