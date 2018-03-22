@@ -302,4 +302,12 @@ def main(msin,config_path, python_path, tgss_server, fits_path):
 
     imagenoise = get_rms(hdu)
     print 'An estimate of the image noise is %.3f muJy/beam' % (imagenoise*1E6)
+
+    # move PNGs into a single directory called inspection_plots and delete any useless files at the end
+    # os.rename('current location', 'new location')
+    # try:
+    #     os.remove(filename)
+    # except OSError:
+    #     pass
+
     return 0
