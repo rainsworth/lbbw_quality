@@ -247,9 +247,14 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     if o['pbimage'] is None:
         die('pbimage must be specified')
 
-    print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
-    print o['list']
-    print type(o['list'])
+
+    #fix o['list'] with catalogues
+    o['list']=[]
+    serverlist=[tgss_server,nvss_server,lotss_server,first_server]
+    for i,cat in enumerate(("TGSS","NVSS","LOTSS","FIRST")):
+        if serverlist[i].upper() != 'NONE':
+            o['list'].append(cat)
+
     # fix up the new list-type options - NO DONT!
     # for i,cat in enumerate(o['list']):
     #     try:
