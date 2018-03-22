@@ -7,11 +7,18 @@ import re
 
 def download_cat(path,url): #need to catch cases where files are packed - what about csv? - conversion?
     filename = url.split('/')[-1]
-    path_to_file = path + filename
+    if filename.split('.')[-1] == 'gz':
+        fitsname = '.'.join(filename.split('.')[:-1])
+    else:
+        fitsname = filename
+
+    path_to_file = path + fitsname
     if os.path.isfile(path_to_file):
-        print("Catalogue "+filename+" already exists - skipping download")
+        print("Catalogue "+fitsname+" already exists - skipping download")
     else:
         os.system("wget " + url +" "+ path)
+        if filename.split('.')[-1] == 'gz':
+            os.system("gunzip "+filename+'.gz')
 
 def _get_terminal_size_linux():
     ''' From https://gist.github.com/jtriley/1108174 '''

@@ -7,7 +7,7 @@
 # Catalogue paths - define as None if you dont want to use a particular one
 ! TGSS_Server  = http://tgssadr.strw.leidenuniv.nl/catalogs/TGSSADR1_7sigma_catalog.fits
 ! NVSS_Server  = None
-! FIRST_Server = None
+! FIRST_Server = http://sundog.stsci.edu/first/catalogs/first_14dec17.fits.gz
 ! LOTS_Server  = None
 
 pipeline.steps = [createmap_cal, quality_step]
