@@ -11,7 +11,7 @@ def download_cat(path,url): #need to catch cases where files are packed - what a
         fitsname = '.'.join(filename.split('.')[:-1])
     else:
         fitsname = filename
-
+#
     path_to_file = path + fitsname
     if os.path.isfile(path_to_file):
         print("Catalogue "+fitsname+" already exists - skipping download")
