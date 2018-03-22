@@ -1,14 +1,15 @@
-! script = /data/scratch/ainsworth/lbbw_quality/quality_pipeline_lb.py
-! util_scripts = /data/scratch/ainsworth/lbbw_quality/utils/
-! config_path  = /data/scratch/ainsworth/lbbw_quality/quality_lb.cfg
-! fits_path    = /data/scratch/ainsworth/image_full_ampphase1m_shift.int.facetRestored.fits
+! my_directory = /data/scratch/ainsworth/
+! script       = {{ my_directory }} /lbbw_quality/quality_pipeline_lb.py
+! util_scripts = {{ my_directory }} /lbbw_quality/utils/
+! config_path  = {{ my_directory }} /lbbw_quality/quality_lb.cfg
+! fits_path    = {{ my_directory }} /image_full_ampphase1m_shift.int.facetRestored.fits
 ! TGSS_Server  = http://tgssadr.strw.leidenuniv.nl/catalogs/TGSSADR1_7sigma_catalog.fits
 
 
-pipeline.steps=[createmap_cal, quality_step]
+pipeline.steps = [createmap_cal, quality_step]
 
 
-# Start a mapfile-procedure so generic pipeline procedure is preserved
+# Start a mapfile procedure so the generic pipeline procedure is preserved
 createmap_cal.control.kind            =   plugin
 createmap_cal.control.type            =   createMapfile
 createmap_cal.control.method          =   mapfile_from_folder
@@ -18,7 +19,7 @@ createmap_cal.control.folder          =   /data/scratch/ainsworth/
 createmap_cal.control.pattern         =   L*.ms
 
 
-# Run the Quality_lb python-script
+# Run the quality_pipeline_lb python-script
 quality_step.control.type             = pythonplugin
 quality_step.argument.msin            = createmap_cal.output.mapfile
 quality_step.control.executable       = {{ script }}
