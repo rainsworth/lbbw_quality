@@ -43,6 +43,16 @@ def main(msin,config_path, python_path, tgss_server):
     rad2arcsec=1.0/arcsec2rad
     steradians2degsquared = (180.0/np.pi)**2.0
     degsquared2steradians = 1.0/steradians2degsquared
+    cat_path= '/'.join(python_path.split('/')[:-2]) + '/catalogues/' # Path to folder with catalogues
+
+    def download_cat(path,url):
+        filename = url.split('/')[-1]
+        path_to_file = path + filename
+        if os.path.isfile(path_to_file):
+            print("Catalogue "+filename+" already exists - skipping download")
+        else:
+            os.system("wget " + url +" "+ path)
+
 
     def download_cat(path,url):
         filename = url.split('/')[-1]
@@ -185,10 +195,10 @@ def main(msin,config_path, python_path, tgss_server):
             t.write(lofarcat+'_'+auxcatname+'_match.fits')
     #----------------------------------------------------------------------------------------------
     #Actual Steps start from here:
+    #Looking for existence of catalogues and downloading if necessary
+    #TGSS:
 
-    #Looking for existence of TGSS_Catalogue and downloading if necessary
-
-    download_cat(tgss_path = '/'.join(python_path.split('/')[:-2]) + '/catalogues/', tgss_server)
+    download_cat(cat_path, tgss_server)
 
 
     global o
