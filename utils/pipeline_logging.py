@@ -1,7 +1,3 @@
-
-
-# taken from DDF pipeline
-
 import subprocess
 import sys
 import select

@@ -1,10 +1,10 @@
 from getcpus import getcpus
 
 option_list = ( ( 'machine', 'NCPU', int, getcpus() ),
-                ( 'image', 'pbimage', str, 'image_full_ampphase1m_shift.int.facetRestored.fits', 'PB-corrected image to use for source finding' ),
+                ( 'image', 'pbimage', str, '/data/scratch/ainsworth/image_full_ampphase1m_shift.int.facetRestored.fits', 'PB-corrected image to use for source finding' ),
                 ( 'image', 'catprefix', str, 'image_full_ampphase1m', 'Prefix to use for output catalogues' ),
                 ( 'control', 'sfind', bool, True, 'Do source finding?' ),
-                ( 'control', 'sfind_pixel_fraction', float, 1.0, 'Source find over what fraction of the image?' ),
+                ( 'control', 'sfind_pixel_fraction', float, 0.5, 'Source find over what fraction of the image?' ),
                 ( 'control', 'quiet', bool, False ),
                 ( 'control', 'logging', str, 'logs' ),
                 ( 'control', 'dryrun', bool, False ),
@@ -26,3 +26,4 @@ option_list = ( ( 'machine', 'NCPU', int, getcpus() ),
                 ( 'comparison_cats', 'FIRST_match_majkey2', float, 'MAJOR' ),
                 ( 'comparison_cats', 'FIRST_filtersize', float, 10.0 ),
                 ( 'comparison_cats', 'FIRST_fluxfactor', float, 1.0 ) )
+

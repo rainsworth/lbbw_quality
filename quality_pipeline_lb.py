@@ -1,121 +1,130 @@
 #!/usr/bin/env python
-
 # Routine to check quality of LOFAR images
-import matplotlib
-matplotlib.use('Agg')
+def main(msin,config_path, python_path):
+    import matplotlib
+    matplotlib.use('Agg')
+    import os,sys
+    import os.path
+    sys.path.append(os.path.abspath(python_path))
+    from quality_parset import option_list
+    from options import options,print_options
+    from astropy.io import fits
+    from astropy.table import Table
+    try:
+        import bdsf as bdsm
+    except ImportError:
+        import lofar.bdsm as bdsm
+    from auxcodes import report,run,get_rms,warn,die,sepn
+    import numpy as np
+    from crossmatch_utils import match_catalogues,filter_catalogue,select_isolated_sources,bootstrap
+    from quality_make_plots import plot_flux_ratios,plot_flux_errors,plot_position_offset
 
-import os,sys
-import os.path
-sys.path.append(os.path.abspath("./utils"))
-from quality_parset import option_list
-from options import options,print_options
-from astropy.io import fits
-from astropy.table import Table
-try:
-    import bdsf as bdsm
-except ImportError:
-    import lofar.bdsm as bdsm
-from auxcodes import report,run,get_rms,warn,die,sepn
-import numpy as np
-from crossmatch_utils import match_catalogues,filter_catalogue,select_isolated_sources,bootstrap
-from quality_make_plots import plot_flux_ratios,plot_flux_errors,plot_position_offset
+    #Define various angle conversion factors
+    arcsec2deg=1.0/3600
+    arcmin2deg=1.0/60
+    deg2rad=np.pi/180
+    deg2arcsec = 1.0/arcsec2deg
+    rad2deg=180.0/np.pi
+    arcmin2rad=arcmin2deg*deg2rad
+    arcsec2rad=arcsec2deg*deg2rad
+    rad2arcmin=1.0/arcmin2rad
+    rad2arcsec=1.0/arcsec2rad
+    steradians2degsquared = (180.0/np.pi)**2.0
+    degsquared2steradians = 1.0/steradians2degsquared
 
-global o
+    def logfilename(s,options=None):
+        if options is None:
+            options=o
+        if options['logging'] is not None:
+            return options['logging']+'/'+s
+        else:
+            return None
 
-#Define various angle conversion factors
-arcsec2deg=1.0/3600
-arcmin2deg=1.0/60
-deg2rad=np.pi/180
-deg2arcsec = 1.0/arcsec2deg
-rad2deg=180.0/np.pi
-arcmin2rad=arcmin2deg*deg2rad
-arcsec2rad=arcsec2deg*deg2rad
-rad2arcmin=1.0/arcmin2rad
-rad2arcsec=1.0/arcsec2rad
-steradians2degsquared = (180.0/np.pi)**2.0
-degsquared2steradians = 1.0/steradians2degsquared
+    def filter_catalog(singlecat,matchedcat,fitsimage,outname,auxcatname,options=None):
+        if options is None:
+            options = o
 
-def logfilename(s,options=None):
-    if options is None:
-        options=o
-    if options['logging'] is not None:
-        return options['logging']+'/'+s
-    else:
-        return None
+        if options['restart'] and os.path.isfile(outname):
+            warn('File ' + outname +' already exists, skipping source filtering step')
+        else:
 
-def filter_catalog(singlecat,matchedcat,fitsimage,outname,auxcatname,options=None):
-    if options is None:
-        options = o
+            matchedcat = Table.read(matchedcat)
+            singlecat = Table.read(singlecat)
 
-    if options['restart'] and os.path.isfile(outname):
-        warn('File ' + outname +' already exists, skipping source filtering step')
-    else:
+            fitsimage = fits.open(fitsimage)
 
-        matchedcat = Table.read(matchedcat)
-        singlecat = Table.read(singlecat)
+            fieldra = fitsimage[0].header['CRVAL1']
+            fielddec = fitsimage[0].header['CRVAL2']
+            fitsimage.close()
 
-        fitsimage = fits.open(fitsimage)
+            print 'Originally',len(matchedcat),'sources'
+            matchedcat=filter_catalogue(matchedcat,fieldra,fielddec,3.0)
 
-        fieldra = fitsimage[0].header['CRVAL1']
-        fielddec = fitsimage[0].header['CRVAL2']
-        fitsimage.close()
+            print '%i sources after filtering for 3.0 deg from centre' % len(matchedcat)
 
-        print 'Originally',len(matchedcat),'sources'
-        matchedcat=filter_catalogue(matchedcat,fieldra,fielddec,3.0)
+            matchedcat=matchedcat[matchedcat['DC_Maj']<10.0]
 
-        print '%i sources after filtering for 3.0 deg from centre' % len(matchedcat)
+            print '%i sources after filtering for sources over 10arcsec in LOFAR' % len(matchedcat)
 
-        matchedcat=matchedcat[matchedcat['DC_Maj']<10.0]
+            # not implemented yet!
+            #tooextendedsources_aux = np.array(np.where(matchedcat[1].data[options['%s_match_majkey2'%auxcatname]] > options['%s_filtersize'%auxcatname])).flatten()
+            #print '%s out of %s sources filtered out as over %sarcsec in %s'%(np.size(tooextendedsources_aux),len(allsources),options['%s_filtersize'%auxcatname],auxcatname)
 
-        print '%i sources after filtering for sources over 10arcsec in LOFAR' % len(matchedcat)
+            matchedcat=select_isolated_sources(matchedcat,30.0)
+            print '%i sources after filtering for isolated sources in LOFAR' % len(matchedcat)
 
-        # not implemented yet!
-        #tooextendedsources_aux = np.array(np.where(matchedcat[1].data[options['%s_match_majkey2'%auxcatname]] > options['%s_filtersize'%auxcatname])).flatten()
-        #print '%s out of %s sources filtered out as over %sarcsec in %s'%(np.size(tooextendedsources_aux),len(allsources),options['%s_filtersize'%auxcatname],auxcatname)
+            matchedcat.write(outname)
 
-        matchedcat=select_isolated_sources(matchedcat,30.0)
-        print '%i sources after filtering for isolated sources in LOFAR' % len(matchedcat)
+    def sfind_image(catprefix,pbimage,sfind_pixel_fraction,options=None):
+        if options is None:
+            options = o
+        f = fits.open(pbimage)
+        imsizex = f[0].header['NAXIS1']
+        imsizey = f[0].header['NAXIS2']
+        f.close()
+	old_dir = os.getcwd()
+	filename = pbimage.split('/')[-1]
+	dirname = '/'.join(pbimage.split('/')[:-1]) + '/'
+	os.chdir(dirname)
+	print('Filename: ', filename)
+	print('Dirname: ', dirname)
+        kwargs={}
+        if o['sfind_pixel_fraction']<1.0:
+            lowerx,upperx = int(((1.0-sfind_pixel_fraction)/2.0)*imsizex),int(((1.0-sfind_pixel_fraction)/2.0)*imsizex + sfind_pixel_fraction*imsizex)
+            lowery,uppery = int(((1.0-sfind_pixel_fraction)/2.0)*imsizey),int(((1.0-sfind_pixel_fraction)/2.0)*imsizey + sfind_pixel_fraction*imsizey)
+            kwargs['trim_box']=(lowerx,upperx,lowery,uppery)
 
-        matchedcat.write(outname)
+        if options['restart'] and os.path.isfile(catprefix +'.cat.fits'):
+            warn('File ' + catprefix +'.cat.fits already exists, skipping source finding step')
+        else:
+            img = bdsm.process_image(filename, detection_image='', thresh_isl=4.0, thresh_pix=5.0, rms_box=(150,15), rms_map=True, mean_map='zero', ini_method='intensity', adaptive_rms_box=True, adaptive_thresh=150, rms_box_bright=(60,15), group_by_isl=False, group_tol=10.0,output_opts=True, output_all=True, atrous_do=False,atrous_jmax=4, flagging_opts=True, flag_maxsize_fwhm=0.5,advanced_opts=True, blank_limit=None,**kwargs)
+            img.write_catalog(outfile=catprefix +'.cat.fits',catalog_type='srl',format='fits',correct_proj='True')
+            img.export_image(outfile=catprefix +'.rms.fits',img_type='rms',img_format='fits',clobber=True)
+            img.export_image(outfile=catprefix +'.resid.fits',img_type='gaus_resid',img_format='fits',clobber=True)
+            img.export_image(outfile=catprefix +'.pybdsmmask.fits',img_type='island_mask',img_format='fits',clobber=True)
+            img.write_catalog(outfile=catprefix +'.cat.reg',catalog_type='srl',format='ds9',correct_proj='True')
+	    #os.chdir(old_dir)
 
-def sfind_image(catprefix,pbimage,sfind_pixel_fraction,options=None):
-    if options is None:
-        options = o
-    f = fits.open(pbimage)
-    imsizex = f[0].header['NAXIS1']
-    imsizey = f[0].header['NAXIS2']
-    f.close()
-    kwargs={}
-    if o['sfind_pixel_fraction']<1.0:
-        lowerx,upperx = int(((1.0-sfind_pixel_fraction)/2.0)*imsizex),int(((1.0-sfind_pixel_fraction)/2.0)*imsizex + sfind_pixel_fraction*imsizex)
-        lowery,uppery = int(((1.0-sfind_pixel_fraction)/2.0)*imsizey),int(((1.0-sfind_pixel_fraction)/2.0)*imsizey + sfind_pixel_fraction*imsizey)
-        kwargs['trim_box']=(lowerx,upperx,lowery,uppery)
+    def crossmatch_image(lofarcat,auxcatname,options=None):
+        if options is None:
+            options = o
+        auxcat = options[auxcatname]
+        if options['restart'] and os.path.isfile(lofarcat + '_' + auxcatname + '_match.fits'):
+            warn('File ' + lofarcat + '_' + auxcatname + '_match.fits already exists, skipping source matching step')
+        else:
+            t=Table.read(lofarcat)
+            tab=Table.read(auxcat)
+            match_catalogues(t,tab,o[auxcatname+'_matchrad'],auxcatname)
+            t=t[~np.isnan(t[auxcatname+'_separation'])]
+            t.write(lofarcat+'_'+auxcatname+'_match.fits')
 
-    if options['restart'] and os.path.isfile(catprefix +'.cat.fits'):
-        warn('File ' + catprefix +'.cat.fits already exists, skipping source finding step')
-    else:
-        img = bdsm.process_image(pbimage, detection_image='', thresh_isl=4.0, thresh_pix=5.0, rms_box=(150,15), rms_map=True, mean_map='zero', ini_method='intensity', adaptive_rms_box=True, adaptive_thresh=150, rms_box_bright=(60,15), group_by_isl=False, group_tol=10.0,output_opts=True, output_all=True, atrous_do=True,atrous_jmax=4, flagging_opts=True, flag_maxsize_fwhm=0.5,advanced_opts=True, blank_limit=None,**kwargs)
-        img.write_catalog(outfile=catprefix +'.cat.fits',catalog_type='srl',format='fits',correct_proj='True')
-        img.export_image(outfile=catprefix +'.rms.fits',img_type='rms',img_format='fits',clobber=True)
-        img.export_image(outfile=catprefix +'.resid.fits',img_type='gaus_resid',img_format='fits',clobber=True)
-        img.export_image(outfile=catprefix +'.pybdsmmask.fits',img_type='island_mask',img_format='fits',clobber=True)
-        img.write_catalog(outfile=catprefix +'.cat.reg',catalog_type='srl',format='ds9',correct_proj='True')
 
-def crossmatch_image(lofarcat,auxcatname,options=None):
-    if options is None:
-        options = o
-    auxcat = options[auxcatname]
-    if options['restart'] and os.path.isfile(lofarcat + '_' + auxcatname + '_match.fits'):
-        warn('File ' + lofarcat + '_' + auxcatname + '_match.fits already exists, skipping source matching step')
-    else:
-        t=Table.read(lofarcat)
-        tab=Table.read(auxcat)
-        match_catalogues(t,tab,o[auxcatname+'_matchrad'],auxcatname)
-        t=t[~np.isnan(t[auxcatname+'_separation'])]
-        t.write(lofarcat+'_'+auxcatname+'_match.fits')
+    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH', os.getcwd())
 
-def main(msin,config_path):
+
+    global o
     o=options(config_path,option_list)
+    print(o)
     if o['pbimage'] is None:
         die('pbimage must be specified')
 

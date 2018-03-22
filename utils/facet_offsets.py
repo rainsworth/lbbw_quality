@@ -1,6 +1,3 @@
-
-# taken from DDF pipeline
-
 # Code to determine what facet a source is in
 
 from astropy.io import fits
