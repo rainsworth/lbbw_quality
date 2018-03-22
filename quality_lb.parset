@@ -1,5 +1,5 @@
-! script = /data020/scratch/sean/lbbw_quality/quality_pipeline_lb.py
-! util_scripts = /data020/scratch/sean/lbbw_quality/utils/
+! script = /data/scratch/ainsworth/lbbw_quality/quality_pipeline_lb.py
+! util_scripts = /data/scratch/ainsworth/lbbw_quality/utils/
 
 pipeline.steps=[createmap_cal, quality_step]
 
@@ -8,11 +8,11 @@ createmap_cal.control.type            =   createMapfile
 createmap_cal.control.method          =   mapfile_from_folder
 createmap_cal.control.mapfile_dir     =   input.output.mapfile_dir
 createmap_cal.control.filename        =   createmap_cal.mapfile
-createmap_cal.control.folder          =   /data020/scratch/sean/measurement_sets
+createmap_cal.control.folder          =   /data/scratch/ainsworth/
 createmap_cal.control.pattern         =   L*.ms
 
 quality_step.control.type             = pythonplugin
 quality_step.argument.msin            = createmap_cal.output.mapfile
 quality_step.control.executable       = {{ script }}
-quality_step.argument.config_path     = '/data020/scratch/sean/lbbw_quality/quality_lb.cfg'
+quality_step.argument.config_path     = '/data/scratch/ainsworth/lbbw_quality/quality_lb.cfg'
 quality_step.argument.python_path     = {{ util_scripts }}

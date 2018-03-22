@@ -104,7 +104,7 @@ def main(msin,config_path, python_path):
             img.export_image(outfile=catprefix +'.resid.fits',img_type='gaus_resid',img_format='fits',clobber=True)
             img.export_image(outfile=catprefix +'.pybdsmmask.fits',img_type='island_mask',img_format='fits',clobber=True)
             img.write_catalog(outfile=catprefix +'.cat.reg',catalog_type='srl',format='ds9',correct_proj='True')
-	    os.chdir(old_dir)
+	    #os.chdir(old_dir)
 
     def crossmatch_image(lofarcat,auxcatname,options=None):
         if options is None:
