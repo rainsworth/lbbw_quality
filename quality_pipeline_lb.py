@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Routine to check quality of LOFAR images
-def main(msin,config_path, python_path):
+def main(msin,config_path, python_path, tgss_server):
     import matplotlib
     matplotlib.use('Agg')
     import os,sys
@@ -31,6 +31,15 @@ def main(msin,config_path, python_path):
     rad2arcsec=1.0/arcsec2rad
     steradians2degsquared = (180.0/np.pi)**2.0
     degsquared2steradians = 1.0/steradians2degsquared
+
+    def download_cat(path,url):
+        filename = url.split('/')[-1]
+        path_to_file = path + filename
+        if os.path.isfile(path_to_file):
+            print("Catalogue "+filename+" already exists - skipping download")
+        else:
+            os.system("wget " + url +" "+ path)
+
 
     def logfilename(s,options=None):
         if options is None:
@@ -118,8 +127,11 @@ def main(msin,config_path, python_path):
             t=t[~np.isnan(t[auxcatname+'_separation'])]
             t.write(lofarcat+'_'+auxcatname+'_match.fits')
 
+    #Actual Steps start from here:
 
-    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH', os.getcwd())
+    #Looking for existence of TGSS_Catalogue and downloading if necessary
+
+    download_cat(tgss_path = '/'.join(python_path.split('/')[:-2]) + '/catalogues/', tgss_server)
 
 
     global o
