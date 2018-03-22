@@ -13,7 +13,7 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     import os
     import os.path
     import sys
-    sys.path.append(os.path.abspath(python_path))
+
 
     try:
         import bdsf as bdsm
@@ -22,7 +22,7 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     import matplotlib
     matplotlib.use('Agg')
     import numpy as np
-
+    sys.path.append(os.path.abspath(python_path))
     #from quality_parset import option_list  ## This file is not needed anymore
     from options import options,print_options,download_cat
     from astropy.io import fits
