@@ -303,11 +303,19 @@ def main(msin,config_path, python_path, tgss_server, fits_path):
     imagenoise = get_rms(hdu)
     print 'An estimate of the image noise is %.3f muJy/beam' % (imagenoise*1E6)
 
-    # move PNGs into a single directory called inspection_plots and delete any useless files at the end
-    # os.rename('current location', 'new location')
-    # try:
-    #     os.remove(filename)
-    # except OSError:
+    # my-directory = '/data020/scratch/sean/measurement_sets/'
+    #
+    # try: # see if the inspection plot directory exists
+    #     os.stat(my-directory + 'inspection_plots')
+    # except: # create it if it does not exist
+    #     os.mkdir(my-directory + 'inspection_plots')
+    #
+    # # move PNGs into a single directory called inspection_plots and delete any useless files at the end
+    # os.rename(my-directory + '*.png', my-directory + 'inspection_plots')
+    #
+    # try: # delete the intermediate files
+    #     os.remove(my-directory + '???')
+    # except OSError: # but skip it if they do not exist
     #     pass
 
     return 0
