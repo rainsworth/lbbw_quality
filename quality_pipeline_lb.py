@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Routine to check quality of LOFAR images
-def main(msin,config_path, python_path, tgss_server):
+def main(msin,config_path, python_path, tgss_server, fits_path):
     ''' Main entry function called by the genericpipeline framework.
     Args:
         msin (str): input measurement set being processed.
@@ -23,13 +23,14 @@ def main(msin,config_path, python_path, tgss_server):
     matplotlib.use('Agg')
     import numpy as np
 
-    from quality_parset import option_list
+    #from quality_parset import option_list  ## This file is not needed anymore
     from options import options,print_options
     from astropy.io import fits
     from astropy.table import Table
     from auxcodes import report,run,get_rms,warn,die,sepn
     from crossmatch_utils import match_catalogues,filter_catalogue,select_isolated_sources,bootstrap
     from quality_make_plots import plot_flux_ratios,plot_flux_errors,plot_position_offset
+    from getcpus import getcpus
 
     # Define various angle conversion factors.
     arcsec2deg=1.0/3600
@@ -44,6 +45,35 @@ def main(msin,config_path, python_path, tgss_server):
     steradians2degsquared = (180.0/np.pi)**2.0
     degsquared2steradians = 1.0/steradians2degsquared
     cat_path= '/'.join(python_path.split('/')[:-2]) + '/catalogues/' # Path to folder with catalogues
+
+    option_list = ( ( 'machine', 'NCPU', int, getcpus() ),
+                    ( 'image', 'pbimage', str, fits_path, 'PB-corrected image to use for source finding' ),
+                    ( 'image', 'catprefix', str, 'image_full_ampphase1m', 'Prefix to use for output catalogues' ),
+                    ( 'control', 'sfind', bool, True, 'Do source finding?' ),
+                    ( 'control', 'sfind_pixel_fraction', float, 0.5, 'Source find over what fraction of the image?' ),
+                    ( 'control', 'quiet', bool, False ),
+                    ( 'control', 'logging', str, 'logs' ),
+                    ( 'control', 'dryrun', bool, False ),
+                    ( 'control', 'restart', bool, True ),
+                    ( 'pybdsm', 'atrous', bool, True ),
+                    ( 'comparison_cats', 'list', list, None ),
+                    ( 'comparison_cats', 'filenames', list, None),
+                    ( 'comparison_cats', 'radii', list, None),
+                    ( 'comparison_cats', 'fluxfactor', list, None),
+                    ( 'comparison_cats', 'TGSS', str, None ),
+                    ( 'comparison_cats', 'TGSS_matchrad', float, 10.0 ),
+                    ( 'comparison_cats', 'TGSS_match_majkey1', float, 'Maj_1' ),
+                    ( 'comparison_cats', 'TGSS_match_majkey2', float, 'Maj_2' ),
+                    ( 'comparison_cats', 'TGSS_filtersize', float, 40.0 ),
+                    ( 'comparison_cats', 'TGSS_fluxfactor', float, 1000.0 ),
+                    ( 'comparison_cats', 'FIRST', str, None ),
+                    ( 'comparison_cats', 'FIRST_matchrad', float, 10.0 ),
+                    ( 'comparison_cats', 'FIRST_match_majkey1', float, 'Maj' ),
+                    ( 'comparison_cats', 'FIRST_match_majkey2', float, 'MAJOR' ),
+                    ( 'comparison_cats', 'FIRST_filtersize', float, 10.0 ),
+                    ( 'comparison_cats', 'FIRST_fluxfactor', float, 1.0 ) )
+
+
 
     def download_cat(path,url):
         filename = url.split('/')[-1]
