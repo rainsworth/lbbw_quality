@@ -15,7 +15,7 @@ createmap_cal.control.type        = createMapfile
 createmap_cal.control.method      = mapfile_from_folder
 createmap_cal.control.mapfile_dir = input.output.mapfile_dir
 createmap_cal.control.filename    = createmap_cal.mapfile
-createmap_cal.control.folder      = /data/scratch/ainsworth/
+createmap_cal.control.folder      = {{ my_directory }}
 createmap_cal.control.pattern     = L*.ms
 
 
