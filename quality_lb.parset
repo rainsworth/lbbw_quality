@@ -1,4 +1,4 @@
-! my_directory = /data/scratch/ainsworth/
+! my_directory = /data020/scratch/sean
 ! script       = {{ my_directory }}/lbbw_quality/quality_pipeline_lb.py
 ! util_scripts = {{ my_directory }}/lbbw_quality/utils/
 ! config_path  = {{ my_directory }}/lbbw_quality/quality_lb.cfg
