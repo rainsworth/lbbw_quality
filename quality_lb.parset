@@ -1,8 +1,19 @@
 ! script = /data/scratch/ainsworth/lbbw_quality/quality_pipeline_lb.py
 ! util_scripts = /data/scratch/ainsworth/lbbw_quality/utils/
+! config_path  = /data/scratch/ainsworth/lbbw_quality/quality_lb.cfg
+! fits_path    = /data/scratch/ainsworth/image_full_ampphase1m_shift.int.facetRestored.fits
+
+# Catalogue Paths - define as None if you dont want to use a particular one
+! TGSS_Server  = http://tgssadr.strw.leidenuniv.nl/catalogs/TGSSADR1_7sigma_catalog.fits
+! NVSS_Server  = None
+! FIRST_Server = None
+! LOTS_Server  = None
+
 
 pipeline.steps=[createmap_cal, quality_step]
 
+
+# Start a mapfile-procedure so generic pipeline procedure is preserved
 createmap_cal.control.kind            =   plugin
 createmap_cal.control.type            =   createMapfile
 createmap_cal.control.method          =   mapfile_from_folder
@@ -11,8 +22,15 @@ createmap_cal.control.filename        =   createmap_cal.mapfile
 createmap_cal.control.folder          =   /data/scratch/ainsworth/
 createmap_cal.control.pattern         =   L*.ms
 
+
+# Run the Quality_lb python-script
 quality_step.control.type             = pythonplugin
 quality_step.argument.msin            = createmap_cal.output.mapfile
 quality_step.control.executable       = {{ script }}
-quality_step.argument.config_path     = '/data/scratch/ainsworth/lbbw_quality/quality_lb.cfg'
+quality_step.argument.config_path     = {{ config_path }}
 quality_step.argument.python_path     = {{ util_scripts }}
+quality_step.argument.fits_path       = {{ fits_path }}
+quality_step.argument.tgss_server     = {{ TGSS_Server }}
+quality_step.argument.nvss_server     = {{ NVSS_Server }}
+quality_step.argument.first_server    = {{ FIRST_Server }}
+quality_step.argument.lots_server     = {{ LOTS_Server }}
