@@ -46,6 +46,8 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     degsquared2steradians = 1.0/steradians2degsquared
     cat_path= '/'.join(python_path.split('/')[:-2]) + '/catalogues/' # Path to folder with catalogues
 
+
+    #get all the catalogues
     catlist=[tgss_server,nvss_server,lots_server,first_server]
     for i,cat in enumerate(("TGSS","NVSS","LOTS","FIRST")):
         if catlist[i].upper() != 'NONE':
@@ -236,10 +238,7 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
             t.write(lofarcat+'_'+auxcatname+'_match.fits')
     #----------------------------------------------------------------------------------------------
     #Actual Steps start from here:
-    #Looking for existence of catalogues and downloading if necessary
-    #TGSS:
 
-    download_cat(cat_path, tgss_server)
 
 
     global o
