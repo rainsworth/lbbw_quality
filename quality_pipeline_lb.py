@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Routine to check quality of LOFAR images
-def main(msin,config_path, python_path, tgss_server, fits_path):
+def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, first_server, lots_server):
     ''' Main entry function called by the genericpipeline framework.
     Args:
         msin (str): input measurement set being processed.
@@ -24,7 +24,7 @@ def main(msin,config_path, python_path, tgss_server, fits_path):
     import numpy as np
 
     #from quality_parset import option_list  ## This file is not needed anymore
-    from options import options,print_options
+    from options import options,print_options,download_cat
     from astropy.io import fits
     from astropy.table import Table
     from auxcodes import report,run,get_rms,warn,die,sepn
@@ -46,6 +46,19 @@ def main(msin,config_path, python_path, tgss_server, fits_path):
     degsquared2steradians = 1.0/steradians2degsquared
     cat_path= '/'.join(python_path.split('/')[:-2]) + '/catalogues/' # Path to folder with catalogues
 
+    catlist=(tgss_server,nvss_server,lots_server,first_server)
+    for i,cat in enumerate(("TGSS","NVSS","LOTS","FIRST")):
+        if catlist[i].upper() != 'NONE':
+            download_cat(cat_path, catlist[i])
+        else:
+            catlist[i] = None
+
+    #     try:
+    #         o[cat]=o['filenames'][i]
+    #     except:
+    #         pass
+
+
     option_list = ( ( 'machine', 'NCPU', int, getcpus() ),
                     ( 'image', 'pbimage', str, fits_path, 'PB-corrected image to use for source finding' ),
                     ( 'image', 'catprefix', str, 'image_full_ampphase1m', 'Prefix to use for output catalogues' ),
@@ -60,13 +73,25 @@ def main(msin,config_path, python_path, tgss_server, fits_path):
                     ( 'comparison_cats', 'filenames', list, None),
                     ( 'comparison_cats', 'radii', list, None),
                     ( 'comparison_cats', 'fluxfactor', list, None),
-                    ( 'comparison_cats', 'TGSS', str, None ),
+                    ( 'comparison_cats', 'TGSS', str, tgss_server ),
                     ( 'comparison_cats', 'TGSS_matchrad', float, 10.0 ),
                     ( 'comparison_cats', 'TGSS_match_majkey1', float, 'Maj_1' ),
                     ( 'comparison_cats', 'TGSS_match_majkey2', float, 'Maj_2' ),
                     ( 'comparison_cats', 'TGSS_filtersize', float, 40.0 ),
                     ( 'comparison_cats', 'TGSS_fluxfactor', float, 1000.0 ),
-                    ( 'comparison_cats', 'FIRST', str, None ),
+                    ( 'comparison_cats', 'NVSS', str, nvss_server ),
+                    ( 'comparison_cats', 'NVSS_matchrad', float, 10.0 ),
+                    ( 'comparison_cats', 'NVSS_match_majkey1', float, 'Maj_1' ),
+                    ( 'comparison_cats', 'NVSS_match_majkey2', float, 'Maj_2' ),
+                    ( 'comparison_cats', 'NVSS_filtersize', float, 40.0 ),
+                    ( 'comparison_cats', 'NVSS_fluxfactor', float, 1000.0 ),
+                    ( 'comparison_cats', 'LOTS', str, lots_server ),
+                    ( 'comparison_cats', 'LOTS_matchrad', float, 10.0 ),
+                    ( 'comparison_cats', 'LOTS_match_majkey1', float, 'Maj_1' ),
+                    ( 'comparison_cats', 'LOTS_match_majkey2', float, 'Maj_2' ),
+                    ( 'comparison_cats', 'LOTS_filtersize', float, 40.0 ),
+                    ( 'comparison_cats', 'LOTS_fluxfactor', float, 1000.0 ),
+                    ( 'comparison_cats', 'FIRST', str, first_server ),
                     ( 'comparison_cats', 'FIRST_matchrad', float, 10.0 ),
                     ( 'comparison_cats', 'FIRST_match_majkey1', float, 'Maj' ),
                     ( 'comparison_cats', 'FIRST_match_majkey2', float, 'MAJOR' ),
@@ -75,22 +100,8 @@ def main(msin,config_path, python_path, tgss_server, fits_path):
 
 
 
-    def download_cat(path,url):
-        filename = url.split('/')[-1]
-        path_to_file = path + filename
-        if os.path.isfile(path_to_file):
-            print("Catalogue "+filename+" already exists - skipping download")
-        else:
-            os.system("wget " + url +" "+ path)
 
 
-    def download_cat(path,url):
-        filename = url.split('/')[-1]
-        path_to_file = path + filename
-        if os.path.isfile(path_to_file):
-            print("Catalogue "+filename+" already exists - skipping download")
-        else:
-            os.system("wget " + url +" "+ path)
 
 
     def logfilename(s,options=None):
@@ -233,24 +244,27 @@ def main(msin,config_path, python_path, tgss_server, fits_path):
 
     global o
     o=options(config_path,option_list)
+    #ingest config data:
+    o['']
+
     print(o)
     if o['pbimage'] is None:
         die('pbimage must be specified')
 
-    # fix up the new list-type options
-    for i,cat in enumerate(o['list']):
-        try:
-            o[cat]=o['filenames'][i]
-        except:
-            pass
-        try:
-            o[cat+'_matchrad']=o['radii'][i]
-        except:
-            pass
-        try:
-            o[cat+'_fluxfactor']=o['fluxfactor'][i]
-        except:
-            pass
+    # fix up the new list-type options - NO DONT!
+    # for i,cat in enumerate(o['list']):
+    #     try:
+    #         o[cat]=o['filenames'][i]
+    #     except:
+    #         pass
+    #     try:
+    #         o[cat+'_matchrad']=o['radii'][i]
+    #     except:
+    #         pass
+    #     try:
+    #         o[cat+'_fluxfactor']=o['fluxfactor'][i]
+    #     except:
+    #         pass
 
     if o['logging'] is not None and not os.path.isdir(o['logging']):
         os.mkdir(o['logging'])
