@@ -247,6 +247,8 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     if o['pbimage'] is None:
         die('pbimage must be specified')
 
+    print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+    print o['list']
     # fix up the new list-type options - NO DONT!
     # for i,cat in enumerate(o['list']):
     #     try:
