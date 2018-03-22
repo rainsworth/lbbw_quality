@@ -126,7 +126,7 @@ def main(msin,config_path, python_path, tgss_server):
             match_catalogues(t,tab,o[auxcatname+'_matchrad'],auxcatname)
             t=t[~np.isnan(t[auxcatname+'_separation'])]
             t.write(lofarcat+'_'+auxcatname+'_match.fits')
-
+    #----------------------------------------------------------------------------------------------
     #Actual Steps start from here:
 
     #Looking for existence of TGSS_Catalogue and downloading if necessary
