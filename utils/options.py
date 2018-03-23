@@ -8,7 +8,7 @@ import re
 def download_cat(path,url, **kwargs): #need to catch cases where files are packed - what about csv? - conversion?
     if kwargs['cat'].upper() == 'LOTSS':
         import download_lotss_catalogue
-        download_lotss_catalogue(kwargs['msin'], ResultsFile=lotss_output, Radius=float(lotss_radius), AllFile=lotss_output+'_all', DoDownload=lotss_download)
+        download_lotss_catalogue(kwargs['msin'], ResultsFile=kwargs['lotss_output'], Radius=float(kwargs['lotss_radius']), AllFile=kwargs['lotss_output']+'_all', DoDownload=kwargs['lotss_download'])
     else:
         filename = url.split('/')[-1]
         if filename.split('.')[-1] == 'gz':
