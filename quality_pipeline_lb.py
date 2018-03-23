@@ -215,6 +215,7 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
 	    #os.chdir(old_dir)
 
     def crossmatch_image(lofarcat,auxcatname,options=None):
+
         ''' Cross match the LOFAR catalogue with an auxilliary catalogue.
 
         Args:
@@ -228,6 +229,10 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
         if options is None:
             options = o
         auxcat = options[auxcatname]
+        print"|||||||||||||||||||||||||||||||||||||||||||||||||||"
+        print options
+        print auxcatname
+        print options[auxcatname]
         if options['restart'] and os.path.isfile(lofarcat + '_' + auxcatname + '_match.fits'):
             warn('File ' + lofarcat + '_' + auxcatname + '_match.fits already exists, skipping source matching step')
         else:
@@ -254,7 +259,9 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     for i,cat in enumerate(("TGSS","NVSS","LOTSS","FIRST")):
         if serverlist[i].upper() != 'NONE':
             o['list'].append(cat)
-
+    print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+    print o['list']
+    print o
     # fix up the new list-type options - NO DONT!
     # for i,cat in enumerate(o['list']):
     #     try:
@@ -279,6 +286,7 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     # matching with catalogs
     for cat in o['list']:
         print 'Doing catalogue',cat
+        print o['catprefix'] + '.cat.fits'
         crossmatch_image(o['catprefix'] + '.cat.fits',cat)
         filter_catalog(o['catprefix'] + '.cat.fits',o['catprefix']+'.cat.fits_'+cat+'_match.fits',o['pbimage'],o['catprefix']+'.cat.fits_'+cat+'_match_filtered.fits',cat,options=o)
 
