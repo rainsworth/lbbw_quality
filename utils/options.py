@@ -6,7 +6,7 @@ import struct
 import re
 
 def download_cat(path,url, **kwargs): #need to catch cases where files are packed - what about csv? - conversion?
-    if cat.upper() == 'LOTSS':
+    if kwargs['cat'].upper() == 'LOTSS':
         import download_lotss_catalogue
         download_lotss_catalogue(msin, ResultsFile=lotss_output, Radius=float(lotss_radius), AllFile=lotss_output+'_all', DoDownload=lotss_download)
     else:
