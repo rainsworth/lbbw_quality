@@ -12,8 +12,6 @@
 ! LOTSS_Output = lotss_catalogue
 # Search radius in degrees.
 ! LOTSS_Radius = 1
-# Set to can be FORCE, True or False.
-! LOTSS_Download = True
 
 pipeline.steps = [createmap_cal, quality_step]
 
