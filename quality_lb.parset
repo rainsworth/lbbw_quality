@@ -8,7 +8,12 @@
 ! TGSS_Server  = http://tgssadr.strw.leidenuniv.nl/catalogs/TGSSADR1_7sigma_catalog.fits
 ! NVSS_Server  = None
 ! FIRST_Server = http://sundog.stsci.edu/first/catalogs/first_14dec17.fits.gz
-! LOTSS_Server  = None
+! LOTSS_Server = http://vo.astron.nl/lofartier1/q/cone/scs.xml
+! LOTSS_Output = lotss_catalogue
+# Search radius in degrees.
+! LOTSS_Radius = 1
+# Set to can be FORCE, True or False.
+! LOTSS_Download = True
 
 pipeline.steps = [createmap_cal, quality_step]
 
@@ -31,4 +36,6 @@ quality_step.argument.fits_path    = {{ fits_path }}
 quality_step.argument.tgss_server  = {{ TGSS_Server }}
 quality_step.argument.nvss_server  = {{ NVSS_Server }}
 quality_step.argument.first_server = {{ FIRST_Server }}
-quality_step.argument.lotss_server  = {{ LOTSS_Server }}
+quality_step.argument.lotss_server = {{ LOTSS_Server }}
+quality_step.argument.lotss_output = {{ LOTSS_Output }}
+quality_step.argument.lotss_radius = {{ LOTSS_Radius }}

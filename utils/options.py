@@ -5,13 +5,17 @@ import os
 import struct
 import re
 
-def download_cat(path,url): #need to catch cases where files are packed - what about csv? - conversion?
-    filename = url.split('/')[-1]
-    if filename.split('.')[-1] == 'gz':
-        fitsname = '.'.join(filename.split('.')[:-1])
+def download_cat(path,url, **kwargs): #need to catch cases where files are packed - what about csv? - conversion?
+    if cat.upper() == 'LOTSS':
+        import download_lotss_catalogue
+        download_lotss_catalogue(msin, ResultsFile=lotss_output, Radius=float(lotss_radius), AllFile=lotss_output+'_all', DoDownload=lotss_download)
     else:
-        fitsname = filename
-#
+        filename = url.split('/')[-1]
+        if filename.split('.')[-1] == 'gz':
+            fitsname = '.'.join(filename.split('.')[:-1])
+        else:
+            fitsname = filename
+
     path_to_file = path + fitsname
     if os.path.isfile(path_to_file):
         print("Catalogue "+fitsname+" already exists - skipping download")

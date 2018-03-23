@@ -121,7 +121,7 @@ def main(ms_input, ResultsFile, Radius=1.5, DoDownload="True", AllFile=None):
         query['RA'] = float( RATar )
         query['DEC'] = float( DECTar )
     except:
-        # Backwards compatability with older versions.
+        # Backwards compatability with older versions of pyvo.
         query.pos = (float( RATar ), float(DECTar))
     query.radius = float( Radius )
     t = query.execute()
