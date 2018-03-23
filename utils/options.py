@@ -7,9 +7,15 @@ import re
 
 def download_cat(path,url, **kwargs): #need to catch cases where files are packed - what about csv? - conversion?
     if kwargs['cat'].upper() == 'LOTSS':
-        print 'Downloading LOTSS'
-        import download_lotss_catalogue
-        download_lotss_catalogue.main(kwargs['msin'], ResultsFile=kwargs['lotss_output'], Radius=float(kwargs['lotss_radius']), AllFile=kwargs['lotss_output']+'_all', DoDownload='True')
+        filename = kwargs['lotss_output'] + '.csv'
+        lotss_path = path + filename
+        filename_all = kwargs['lotss_output'] + '_all.csv'
+        lotss_path_all = path + filename_all
+        if os.path.isfile(lotss_path) and os.path.isfile(lotss_path_all):
+            print 'Catalogues '+filename+' and '+filename_all+' already exist - skipping download.'
+        else:
+            import download_lotss_catalogue
+            download_lotss_catalogue.main(kwargs['msin'], ResultsFile=kwargs['lotss_output'], Radius=float(kwargs['lotss_radius']), AllFile=kwargs['lotss_output']+'_all', DoDownload='True')
     else:
         filename = url.split('/')[-1]
         if filename.split('.')[-1] == 'gz':
@@ -17,14 +23,14 @@ def download_cat(path,url, **kwargs): #need to catch cases where files are packe
         else:
             fitsname = filename
 
-    path_to_file = path + fitsname
-    if os.path.isfile(path_to_file):
-        print("Catalogue "+fitsname+" already exists - skipping download")
-    else:
-        os.system("wget " + url +" "+ path)
-        if filename.split('.')[-1] == 'gz':
-            os.system("gunzip -c " + filename + " > "+ path_to_file)
-    return path + fitsname
+        path_to_file = path + fitsname
+        if os.path.isfile(path_to_file):
+            print("Catalogue "+fitsname+" already exists - skipping download.")
+        else:
+            os.system("wget " + url +" "+ path)
+            if filename.split('.')[-1] == 'gz':
+                os.system("gunzip -c " + filename + " > "+ path_to_file)
+        return path + fitsname
 
 def _get_terminal_size_linux():
     ''' From https://gist.github.com/jtriley/1108174 '''
