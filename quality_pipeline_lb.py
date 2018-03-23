@@ -51,7 +51,7 @@ def main(msin,config_path, python_path, fits_path, tgss_server, nvss_server, fir
     catlist=[tgss_server,nvss_server,lotss_server,first_server]
     for i,cat in enumerate(("TGSS","NVSS","LOTSS","FIRST")):
         if catlist[i].upper() != 'NONE':
-            catlist[i] = download_cat(cat_path, catlist[i], cat=cat, msin=msin, kwargs)
+            catlist[i] = download_cat(cat_path, catlist[i], cat=cat, msin=msin, **kwargs)
         else:
             catlist[i] = None
 
