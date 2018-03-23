@@ -15,7 +15,7 @@ def download_cat(path,url, **kwargs): #need to catch cases where files are packe
             print 'Catalogues '+filename+' and '+filename_all+' already exist - skipping download.'
         else:
             import download_lotss_catalogue
-            download_lotss_catalogue.main(kwargs['msin'], ResultsFile=kwargs['lotss_output'], Radius=float(kwargs['lotss_radius']), AllFile=kwargs['lotss_output']+'_all', DoDownload='True')
+            download_lotss_catalogue.main(kwargs['msin'], ResultsFile=lotss_path, Radius=float(kwargs['lotss_radius']), AllFile=lotss_path_all, DoDownload='True')
     else:
         filename = url.split('/')[-1]
         if filename.split('.')[-1] == 'gz':
