@@ -26,7 +26,7 @@ def grab_coo_MS(MS):
     """
 
     # reading the coordinates ("position") from the MS
-    # NB: they are given in rad,rad (J2000) 
+    # NB: they are given in rad,rad (J2000)
     [[[ra,dec]]] = pt.table(MS+'/FIELD', readonly=True, ack=False).getcol('PHASE_DIR')
 
     # RA is stocked in the MS in [-pi;pi]
@@ -75,11 +75,11 @@ def main(ms_input, ResultsFile, Radius=1.5, DoDownload="True", AllFile=None):
     DoDownload : str ("Force" or "True" or "False")
         Download or not the LOTSS skymodel.
         "Force": download skymodel from LOTSS, delete existing skymodel if needed.
-        "True" or "Yes": use existing skymodel file if it exists, download skymodel from 
+        "True" or "Yes": use existing skymodel file if it exists, download skymodel from
                          LOTSS if it does not.
         "False" or "No": Do not download skymodel, raise an exception if skymodel
                          file does not exist.
-    
+
     """
 
     FileExists = os.path.isfile(ResultsFile)
@@ -117,11 +117,14 @@ def main(ms_input, ResultsFile, Radius=1.5, DoDownload="True", AllFile=None):
 
     ## this works
     query = vo.dal.scs.SCSQuery( url )
-    #query['RA'] = float( RATar )
-    #query['DEC'] = float( DECTar )
-    query.pos = (float( RATar ), float(DECTar))
+    try:
+        query['RA'] = float( RATar )
+        query['DEC'] = float( DECTar )
+    except:
+        # Backwards compatability with older versions.
+        query.pos = (float( RATar ), float(DECTar))
     query.radius = float( Radius )
-    t = query.execute()   
+    t = query.execute()
     ## this does not
     #t = vo.conesearch( url, pos=mypos, radius=float(Radius) )
 
@@ -133,13 +136,13 @@ def main(ms_input, ResultsFile, Radius=1.5, DoDownload="True", AllFile=None):
     perc_unres = len( unresolved_index ) / nsrcs * 100.
     print 'Percentage of sources which are unresolved: '+str( perc_unres )
     utb = tb[unresolved_index]
- 
+
     ## sort by flux
     flux_sort = utb.argsort('Total_flux')
     utb_sorted = utb[ flux_sort[::-1] ]
     if AllFile is not None:
         utb_sorted.write( AllFile, format='ascii.csv' )
-    
+
     ## keep only RA, DEC, Source_id and reorder the columns
     utb_sorted.keep_columns(['RA','DEC','Source_id'])
 
@@ -161,6 +164,5 @@ if __name__ == "__main__":
     radius=1.5
     if args.Radius:
         radius=args.Radius
-    
-    main(args.MSfile,args.Outfile,Radius=radius,AllFile=args.Outfile+'_all')
 
+    main(args.MSfile,args.Outfile,Radius=radius,AllFile=args.Outfile+'_all')
