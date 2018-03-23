@@ -16,6 +16,7 @@ def download_cat(path,url, **kwargs): #need to catch cases where files are packe
         else:
             import download_lotss_catalogue
             download_lotss_catalogue.main(kwargs['msin'], ResultsFile=lotss_path, Radius=float(kwargs['lotss_radius']), AllFile=lotss_path_all, DoDownload='True')
+        return lotss_path_all
     else:
         filename = url.split('/')[-1]
         if filename.split('.')[-1] == 'gz':
